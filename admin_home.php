@@ -27,13 +27,15 @@ $pendingVideos = $conn->query("SELECT id, title, created_at FROM videos WHERE ap
       color: #333;
     }
     .site-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #fbe287;
-      padding: 20px 40px;
-      border-bottom: 1px solid #d4b44c;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #ffd700, #ffcc33); /* shiny gold effect */
+  padding: 20px 40px;
+  border-bottom: 1px solid #c9a300;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
     .site-header h1 {
       margin: 0;
       font-size: 26px;
@@ -124,20 +126,65 @@ $pendingVideos = $conn->query("SELECT id, title, created_at FROM videos WHERE ap
       border-radius: 5px;
       cursor: pointer;
     }
+    .wave-emoji {
+    display: inline-block;
+    animation: wave 2s infinite;
+    transform-origin: 70% 70%;
+}
+@keyframes wave {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+    60% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
   </style>
 </head>
 <body>
-<header class="site-header">
- <h1>
-  <img src="uploads/crypteach_logo.png" alt="CrypTeach Logo" style="height: 60px; width: auto; margin-right: 16px;">
-  CrypTeach Admin
-</h1>
+<header style="
+    background: linear-gradient(to right, #fbbf24, #fcd34d);
+    padding: 18px 40px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI', sans-serif;
+">
+    <!-- Left: Logo + Greeting -->
+    <div style="display: flex; align-items: center; gap: 20px;">
+       <img src="uploads/crypteach_logo.png" alt="CrypTeach Logo" style="height: 64px; width: auto;">
 
-  <div class="header-right">
-    <span>👤 <?= htmlspecialchars($_SESSION['username']) ?></span>
-    <a href="logout.php">Logout</a>
-  </div>
+        <div>
+            <div style="font-size: 24px; font-weight: 600; color: white;">
+                Hello, <span style="text-transform: capitalize;"><?= htmlspecialchars($_SESSION['username']) ?></span>
+                <span class="wave-emoji">👋🏻</span>
+            </div>
+            <div style="font-size: 14px; color: #fffbe8;">Welcome to the admin panel</div>
+        </div>
+    </div>
+
+    <!-- Right: Logout Button -->
+        <a href="logout.php" style="
+        background-color: white;
+        color: #333;
+        font-weight: 600;
+        padding: 8px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    " onmouseover="this.style.backgroundColor='#f1f1f1'; this.style.transform='scale(1.05)'" onmouseout="this.style.backgroundColor='white'; this.style.transform='scale(1)'">
+        Logout
+    </a>
 </header>
+
+
 
 <div class="dashboard-card fade-in">
   <h2>Welcome, Admin!</h2>
