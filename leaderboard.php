@@ -6,8 +6,22 @@ if (!isset($_SESSION['user_id'])) {
 }
 include 'db.php';
 
-// Only fetch students
-$result = $conn->query("SELECT username, score FROM users WHERE role='student' ORDER BY score DESC");
+$userId = $_SESSION['user_id'];
+$currentUser = $_SESSION['username'];
+
+// Top 10 students for display
+$result = $conn->query("SELECT username, score FROM users WHERE role='student' ORDER BY score DESC LIMIT 10");
+
+// Get logged-in user's rank
+$rankQuery = $conn->query("
+    SELECT COUNT(*) AS rank FROM users 
+    WHERE role='student' AND score > (SELECT score FROM users WHERE id = $userId)
+");
+$userRank = $rankQuery->fetch_assoc()['rank'] + 1;
+
+// Get user's score (in case not in top 10)
+$userScoreQuery = $conn->query("SELECT score FROM users WHERE id = $userId");
+$userScore = $userScoreQuery->fetch_assoc()['score'];
 ?>
 
 <!DOCTYPE html>
@@ -85,6 +99,10 @@ $result = $conn->query("SELECT username, score FROM users WHERE role='student' O
             background-color: #fff6d3;
         }
 
+        .highlight-user {
+            background-color: #fff1b8 !important;
+        }
+
         .btn-back {
             margin-top: 30px;
             padding: 10px 25px;
@@ -127,7 +145,7 @@ $result = $conn->query("SELECT username, score FROM users WHERE role='student' O
         <tbody>
             <?php $rank = 1; ?>
             <?php while ($row = $result->fetch_assoc()): ?>
-                <tr>
+                <tr<?= ($row['username'] === $currentUser) ? ' class="highlight-user"' : '' ?>>
                     <td>
                         <?php
                         if ($rank == 1) echo "🥇";
@@ -136,13 +154,21 @@ $result = $conn->query("SELECT username, score FROM users WHERE role='student' O
                         else echo $rank;
                         ?>
                     </td>
-                    <td><?= htmlspecialchars($row['username']) ?></td>
+                    <td>
+                        <?= htmlspecialchars($row['username']) ?>
+                        <?= ($row['username'] === $currentUser) ? ' ⭐' : '' ?>
+                    </td>
                     <td><strong><?= $row['score'] ?> pts</strong></td>
                 </tr>
                 <?php $rank++; ?>
             <?php endwhile; ?>
         </tbody>
     </table>
+
+    <?php if ($userRank > 10): ?>
+        <p class="mt-4"><strong>👤 Your Rank:</strong> #<?= $userRank ?> — <?= $userScore ?> pts</p>
+    <?php endif; ?>
+
     <a href="<?= ($_SESSION['role'] === 'admin') ? 'admin_home.php' : 'user_home.php' ?>" class="btn-back">← Back to Home</a>
 </div>
 </body>

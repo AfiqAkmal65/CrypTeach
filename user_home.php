@@ -10,6 +10,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'student') {
 $userId = (int) $_SESSION['user_id'];
 $username = htmlspecialchars($_SESSION['username'], ENT_QUOTES);
 
+
+
 // Fetch profile photo safely
 $profilePic = 'https://ui-avatars.com/api/?name=' . urlencode($username);
 if ($stmt = $conn->prepare("SELECT profile_photo FROM users WHERE id = ?")) {
@@ -66,7 +68,20 @@ if ($stmt = $conn->prepare("
 }
 
 // Tip of the day
-$crypto_tip = "RSA keys are stronger when they use at least 2048 bits.";
+$crypto_tips = [
+    "🔐 RSA keys are stronger when they use at least 2048 bits.",
+    "🧾 Hash functions like SHA-256 are one-way and irreversible.",
+    "🔄 The Caesar cipher is one of the oldest and simplest encryption techniques.",
+    "📡 Public key encryption allows secure communication over insecure channels.",
+    "💡 Symmetric encryption uses the same key to encrypt and decrypt data.",
+    "🧠 A strong password should include uppercase, lowercase, numbers, and symbols.",
+    "🔏 AES (Advanced Encryption Standard) is widely used for secure data encryption.",
+    "🕵️‍♂️ Steganography hides data within images, audio, or text.",
+    "🧬 Base64 encoding is not encryption—just a way to represent binary data in text.",
+    "🗝️ Never share your private keys; only public keys should be distributed."
+];
+$crypto_tip = $crypto_tips[array_rand($crypto_tips)];
+
 
 // Earned badges
 $badges = [];
@@ -86,6 +101,40 @@ if ($res = $conn->prepare("SELECT game_name FROM user_game_status WHERE user_id 
     }
     $res->close();
 }
+
+$weekly_challenges = [
+    [
+        'hint' => 'Caesar Cipher, Shift by 2',
+        'encrypted' => 'jgnnq',
+        'answer' => 'hello'
+    ],
+    [
+        'hint' => 'Caesar Cipher, Shift by 3',
+        'encrypted' => 'khoor',
+        'answer' => 'hello'
+    ],
+    [
+        'hint' => 'Reverse Cipher',
+        'encrypted' => 'dlrow',
+        'answer' => 'world'
+    ],
+    [
+        'hint' => 'Base64 Encoded',
+        'encrypted' => base64_encode('secure'),
+        'answer' => 'secure'
+    ],
+    [
+        'hint' => 'Caesar Cipher, Shift by 5',
+        'encrypted' => 'mjqqt',
+        'answer' => 'hello'
+    ]
+];
+
+// Pick one randomly
+$challenge = $weekly_challenges[array_rand($weekly_challenges)];
+$hint = $challenge['hint'];
+$encrypted = $challenge['encrypted'];
+$correctAnswer = $challenge['answer'];
 ?>
 
 
@@ -296,9 +345,11 @@ font-family: 'Segoe UI', sans-serif;
 
 
 <h4 class="section-title">📰 Crypto Insight</h4>
-<div class="card mb-4">
-    <p><?= $crypto_tip ?></p>
+<div class="card mb-4" style="background: #fffdf0; border-left: 6px solid #fbbf24; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); padding: 16px; animation: fadeIn 1s;">
+    <p style="font-size: 15px; font-weight: 500; color: #333;"><?= $crypto_tip ?></p>
+    <small class="text-muted">💡 Tip updates every time you refresh!</small>
 </div>
+
 
 <h4 class="section-title">🏅 Your Badges</h4>
 <div class="card badge-list mb-4">
@@ -349,22 +400,25 @@ font-family: 'Segoe UI', sans-serif;
 
 <h4 class="section-title">🔓 Weekly Challenge</h4>
 <div class="card mb-5">
-    <p><strong>Hint:</strong> Caesar Cipher, Shift by 2</p>
-    <p><strong>Encrypted:</strong> jgnnq</p>
+    <p><strong>Hint:</strong> <?= htmlspecialchars($hint) ?></p>
+    <p><strong>Encrypted:</strong> <?= htmlspecialchars($encrypted) ?></p>
     <form method="post">
         <input type="text" name="answer" placeholder="Enter decrypted word..." class="form-control mb-2" required>
         <button class="btn btn-success">Submit</button>
     </form>
+
     <?php
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $attempt = strtolower(trim($_POST['answer']));
-        echo $attempt === 'hello'
-            ? '<div class="alert alert-success mt-2">✅ Correct! You cracked the cipher!</div>'
-            : '<div class="alert alert-danger mt-2">❌ Not quite. Try again!</div>';
+        if ($attempt === strtolower($correctAnswer)) {
+            echo '<div class="alert alert-success mt-2">✅ Correct! You cracked the cipher!</div>';
+        } else {
+            echo '<div class="alert alert-danger mt-2">❌ Not quite. Try again!</div>';
+        }
     }
     ?>
-</div>
 
+  
 
 </div>
 
@@ -487,15 +541,55 @@ window.onclick = function(event) {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #fbbf24;
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
   color: #fff;
   font-weight: bold;
-  padding: 12px 20px;
+  padding: 12px 22px;
   border: none;
   border-radius: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  animation: float 2s ease-in-out infinite;
 }
+
+#chat-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon bounce animation */
+#chat-toggle i {
+  animation: bounce 2s infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Icon bounce */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(2px);
+  }
+}
+
 
 </style>
 

@@ -1,0 +1,25 @@
+Here are three multiple choice questions based on the provided content,  assuming a basic understanding of cryptography is implied:
+
+
+1.  Which of the following is NOT a fundamental goal of cryptography?
+
+    a) Confidentiality  
+    b) Integrity
+    c) Authenticity
+    d) **Complexity**   **(Correct Answer)**
+
+
+2.  Cryptography primarily deals with:
+
+    a)  The efficient transmission of large files.
+    b) The creation of visually appealing images.
+    c) **The protection of information from unauthorized access.**  **(Correct Answer)**
+    d) The development of high-speed computer processors.
+
+
+3.  A core principle of cryptography involves:
+
+    a)  Making data easily accessible to everyone.
+    b)  Using simple, easily guessable codes.
+    c)  **Transforming readable data into an unreadable format.**  **(Correct Answer)**
+    d)  Storing data without any security measures.

@@ -1,10 +1,15 @@
 <?php
 session_start();
 include 'db.php';
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-// Insert visit
+// IP-based tracking (for public page)
 $user_ip = $_SERVER['REMOTE_ADDR'];
-$conn->query("INSERT INTO site_visits (ip_address) VALUES ('$user_ip')");
+
+$stmt = $conn->prepare("INSERT INTO site_visits (ip_address) VALUES (?)");
+$stmt->bind_param("s", $user_ip);
+$stmt->execute();
+$stmt->close();
 
 // Count total and unique visits
 $visitResult = $conn->query("SELECT COUNT(*) AS total FROM site_visits");
@@ -12,6 +17,8 @@ $totalVisits = $visitResult->fetch_assoc()['total'] ?? 0;
 
 $uniqueResult = $conn->query("SELECT COUNT(DISTINCT ip_address) AS unique_visitors FROM site_visits");
 $uniqueVisitors = $uniqueResult->fetch_assoc()['unique_visitors'] ?? 0;
+
+
 
 // Get user comments
 $commentsResult = $conn->query("SELECT name, comment, created_at FROM comments ORDER BY created_at DESC");
@@ -311,19 +318,21 @@ h3 {
   <a href="signup.php" class="cta-button">Get Started</a>
   <div class="info-rotate-box" id="rotatingMessage">💡 Cryptography is the foundation of secure communication.</div>
 
-  <!-- Visitors Display -->
-<div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px;">
-  <div style="background-color: #ffffff; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; color: #222;">
-    <i class="fas fa-users" style="font-size: 30px; color: #b78c2a;"></i>
-    <h3 style="margin-top: 10px; font-size: 24px; font-weight: bold; color: #222;"><?= $totalVisits ?></h3>
-    <p style="margin: 0; color: #444; font-weight: 500;">Total Visits</p>
+ <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px;">
+  <div style="background-color: #ffffff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); text-align: center; width: 250px;">
+    <i class="fas fa-users" style="font-size: 28px; color: #d97706;"></i>
+    <h3 style="margin: 10px 0 5px; color: #222; font-weight: bold;">Unique Visitors</h3>
+    <p style="font-size: 22px; color: #000; font-weight: bold;"><?= $uniqueVisitors ?></p>
   </div>
-  <div style="background-color: #ffffff; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; color: #222;">
-    <i class="fas fa-user" style="font-size: 30px; color: #b78c2a;"></i>
-    <h3 style="margin-top: 10px; font-size: 24px; font-weight: bold; color: #222;"><?= $uniqueVisitors ?></h3>
-    <p style="margin: 0; color: #444; font-weight: 500;">Unique Visitors</p>
+
+  <div style="background-color: #ffffff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); text-align: center; width: 250px;">
+    <i class="fas fa-shoe-prints" style="font-size: 28px; color: #6d28d9;"></i>
+    <h3 style="margin: 10px 0 5px; color: #222; font-weight: bold;">Total Visits</h3>
+    <p style="font-size: 22px; color: #000; font-weight: bold;"><?= $totalVisits ?></p>
   </div>
 </div>
+
+
 
 </main>
 
